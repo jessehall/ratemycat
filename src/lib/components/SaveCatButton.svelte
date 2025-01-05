@@ -1,6 +1,8 @@
 <script>
+    import SaveSuccessModal from './SaveSuccessModal.svelte';
     export let catId = '';
     export let imageUrl = '';
+    let showSuccessModal = false;
     
     async function saveCat() {
         try {
@@ -17,7 +19,7 @@
             });
 
             if (response.ok) {
-                alert('Cat saved to favorites!');
+                showSuccessModal = true;
             } else {
                 alert('Failed to save cat. Please try again.');
             }
@@ -27,6 +29,11 @@
         }
     }
 </script>
+
+<SaveSuccessModal 
+    show={showSuccessModal} 
+    onClose={() => showSuccessModal = false}
+/>
 
 <button
     on:click={saveCat}

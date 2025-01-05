@@ -39,14 +39,24 @@
   
   async function fetchNewCat() {
     isLoading = true;
-    const response = await fetch('https://api.thecatapi.com/v1/images/search', {
-      headers: {
-        'x-api-key': import.meta.env.VITE_CAT_API_KEY
+    try {
+      const response = await fetch('https://api.thecatapi.com/v1/images/search', {
+        headers: {
+          'x-api-key': import.meta.env.VITE_CAT_API_KEY || ''
+        }
+      });
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    });
-    const [data] = await response.json();
-    currentCat = data;
-    isLoading = false;
+      const [data] = await response.json();
+      currentCat = data;
+    } catch (error) {
+      console.error('Error fetching cat:', error);
+      // Set a default cat image or show error state
+      currentCat = null;
+    } finally {
+      isLoading = false;
+    }
   }
 
   /**
@@ -61,7 +71,7 @@
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'x-api-key': import.meta.env.VITE_CAT_API_KEY
+          'x-api-key': import.meta.env.VITE_CAT_API_KEY || ''
         },
         body: JSON.stringify({
           image_id: currentCat.id,
@@ -71,8 +81,7 @@
       });
 
       if (!response.ok) {
-        console.error('Failed to submit vote:', response.status);
-        // Continue with score update even if vote submission fails
+        throw new Error(`Failed to submit vote: ${response.status}`);
       }
 
       score++;
@@ -80,10 +89,8 @@
       fetchNewCat();
     } catch (error) {
       console.error('Error submitting vote:', error);
-      // Continue with score update even if vote submission fails
-      score++;
-      handleRating();
-      fetchNewCat();
+      // Show error message to user
+      alert('Failed to rate cat. Please try again.');
     }
   }
 
