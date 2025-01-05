@@ -11,22 +11,26 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-api-key': import.meta.env.VITE_CAT_API_KEY
+                    'x-api-key': import.meta.env.VITE_CAT_API_KEY || ''
                 },
                 body: JSON.stringify({
                     image_id: catId,
-                    sub_id: 'user-123'
+                    sub_id: 'user-1'
                 })
             });
+
+            const responseData = await response.json();
+            console.log('Save response:', responseData);
 
             if (response.ok) {
                 showSuccessModal = true;
             } else {
-                alert('Failed to save cat. Please try again.');
+                console.error('Save response:', responseData);
+                throw new Error(`Failed to save cat: ${JSON.stringify(responseData)}`);
             }
         } catch (error) {
             console.error('Error saving cat:', error);
-            alert('Failed to save cat. Please try again.');
+            alert(`Failed to save cat: ${error.message}`);
         }
     }
 </script>
