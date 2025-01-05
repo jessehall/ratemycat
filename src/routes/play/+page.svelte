@@ -33,20 +33,35 @@
   async function rateCat(value) {
     if (!currentCat) return;
     
-    await fetch('https://api.thecatapi.com/v1/votes', {
-      method: 'POST',
-      headers: {
-        'content-type': 'application/json',
-        'x-api-key': import.meta.env.VITE_CAT_API_KEY
-      },
-      body: JSON.stringify({
-        image_id: currentCat.id,
-        value: value
-      })
-    });
+    try {
+      const response = await fetch('https://api.thecatapi.com/v1/votes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': import.meta.env.VITE_CAT_API_KEY
+        },
+        body: JSON.stringify({
+          image_id: currentCat.id,
+          sub_id: 'user-123',
+          value: value
+        })
+      });
 
-    score++;
-    fetchNewCat();
+      if (!response.ok) {
+        console.error('Failed to submit vote:', response.status);
+        // Continue with score update even if vote submission fails
+      }
+
+      score++;
+      handleRating();
+      fetchNewCat();
+    } catch (error) {
+      console.error('Error submitting vote:', error);
+      // Continue with score update even if vote submission fails
+      score++;
+      handleRating();
+      fetchNewCat();
+    }
   }
 
   /**
