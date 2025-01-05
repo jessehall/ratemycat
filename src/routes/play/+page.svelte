@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import LoginPromptModal from '$lib/components/LoginPromptModal.svelte';
+  import InstructionsModal from '$lib/components/InstructionsModal.svelte';
 
   /** @typedef {{id: string, url: string}} CatImage */
 
@@ -12,6 +13,7 @@
   let touchStart = 0;
   let touchEnd = 0;
   let isLoading = true;
+  let showInstructions = true;
   
   async function fetchNewCat() {
     isLoading = true;
@@ -110,6 +112,7 @@
 </script>
 
 <LoginPromptModal bind:show={showLoginModal} />
+<InstructionsModal bind:show={showInstructions} />
 
 <div class="relative min-h-screen">
   <!-- Score counter -->
@@ -145,7 +148,7 @@
   <button
     class="fixed left-4 top-1/2 transform -translate-y-1/2 bg-red-500 hover:bg-red-700 
            text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-all duration-300 
-           hover:scale-110 hidden md:block"
+           hover:scale-110"
     on:click={() => {
       rateCat(-1);
       handleRating();
@@ -157,7 +160,7 @@
   <button
     class="fixed right-4 top-1/2 transform -translate-y-1/2 bg-green-500 hover:bg-green-700 
            text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-all duration-300 
-           hover:scale-110 hidden md:block"
+           hover:scale-110"
     on:click={() => {
       rateCat(1);
       handleRating();
