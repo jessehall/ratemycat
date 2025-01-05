@@ -1,12 +1,40 @@
 <script>
-    const mockUsers = [
-        { name: 'Whiskers McGee', rating: 'Hot!', time: '2m ago', avatar: '🐱' },
-        { name: 'Pawsome Paula', rating: 'Not', time: '5m ago', avatar: '😺' },
-        { name: 'Meow Master', rating: 'Hot!', time: '7m ago', avatar: '😸' },
-        { name: 'Purrington III', rating: 'Hot!', time: '12m ago', avatar: '😺' },
-        { name: 'Feline Dion', rating: 'Not', time: '15m ago', avatar: '🐱' },
-        { name: 'Claw-dia', rating: 'Hot!', time: '20m ago', avatar: '😸' }
+    import { flip } from 'svelte/animate';
+    import { fade } from 'svelte/transition';
+
+    let mockUsers = [
+        { id: 1, name: 'Whiskers McGee', avatar: '🐱' },
+        { id: 2, name: 'Pawsome Paula', avatar: '😺' },
+        { id: 3, name: 'Meow Master', avatar: '😸' },
+        { id: 4, name: 'Purrington III', avatar: '😺' },
+        { id: 5, name: 'Feline Dion', avatar: '🐱' },
+        { id: 6, name: 'Claw-dia', avatar: '😸' }
     ];
+
+    const ratings = ['PURRFECT!', 'HOTTER!', 'HOT!', 'MEH', 'NOT QUITE', 'NOT'];
+    export let clickCount = 0;
+
+    $: if (clickCount > 0) {
+        mockUsers = [...mockUsers]
+            .sort(() => Math.random() - 0.5)
+            .map((user, index) => ({
+                ...user,
+                rating: ratings[index],
+                time: '1s ago'
+            }));
+    }
+
+    $: getRatingColor = (rating) => {
+        switch(rating) {
+            case 'PURRFECT!': return '#FF1493'; // Deep pink
+            case 'HOTTER!': return '#FF4500';   // Orange red
+            case 'HOT!': return '#FF6B6B';      // Light red
+            case 'MEH': return '#FFA500';       // Orange
+            case 'NOT QUITE': return '#808080';  // Gray
+            case 'NOT': return '#ef4444';       // Red
+            default: return '#374151';
+        }
+    };
 </script>
 
 <div class="sidebar">
@@ -20,12 +48,19 @@
 
     <div class="recent-activity">
         <h3>Recent Ratings</h3>
-        {#each mockUsers as user}
-            <div class="activity-item">
+        {#each mockUsers as user (user.id)}
+            <div 
+                class="activity-item"
+                animate:flip={{ duration: 500 }}
+                in:fade={{ duration: 200 }}
+            >
                 <span class="user-avatar">{user.avatar}</span>
                 <div class="activity-details">
                     <span class="user-name">{user.name}</span>
-                    <span class="rating" class:hot={user.rating === 'Hot!'}>
+                    <span 
+                        class="rating" 
+                        style="color: {getRatingColor(user.rating)}"
+                    >
                         {user.rating}
                     </span>
                     <span class="time">{user.time}</span>
@@ -47,6 +82,7 @@
         padding: 1.5rem;
         overflow-y: auto;
         box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+        z-index: 50;
     }
 
     .profile-section {
@@ -113,11 +149,7 @@
 
     .rating {
         font-size: 0.8rem;
-        color: #ef4444;
-    }
-
-    .rating.hot {
-        color: #22c55e;
+        font-weight: bold;
     }
 
     .time {
