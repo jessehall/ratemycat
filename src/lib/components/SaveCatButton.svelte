@@ -11,7 +11,7 @@
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-api-key': import.meta.env.VITE_CAT_API_KEY || ''
+                    'x-api-key': 'live_yPLrD2WynMD6OS50beH5EvUAuPvRUcto29HBOHTGb2IpJveIHQ23PkHcnq0eLhsd'
                 },
                 body: JSON.stringify({
                     image_id: catId,
