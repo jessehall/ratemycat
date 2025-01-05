@@ -8,13 +8,18 @@
         try {
             const response = await fetch('https://api.thecatapi.com/v1/favourites', {
                 headers: {
-                    'x-api-key': import.meta.env.VITE_CAT_API_KEY
+                    'x-api-key': 'live_yPLrD2WynMD6OS50beH5EvUAuPvRUcto29HBOHTGb2IpJveIHQ23PkHcnq0eLhsd'
                 }
             });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
             const data = await response.json();
             savedCats = data;
         } catch (error) {
             console.error('Error fetching saved cats:', error);
+            savedCats = [];
         } finally {
             isLoading = false;
         }
