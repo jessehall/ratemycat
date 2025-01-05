@@ -1,8 +1,31 @@
 <script>
     import { onMount } from 'svelte';
+    import { fade, scale } from 'svelte/transition';
+    import { flip } from 'svelte/animate';
 
     let savedCats = [];
     let isLoading = true;
+
+    async function deleteCat(favouriteId) {
+        try {
+            const response = await fetch(`https://api.thecatapi.com/v1/favourites/${favouriteId}`, {
+                method: 'DELETE',
+                headers: {
+                    'x-api-key': 'live_yPLrD2WynMD6OS50beH5EvUAuPvRUcto29HBOHTGb2IpJveIHQ23PkHcnq0eLhsd'
+                }
+            });
+
+            if (response.ok) {
+                // Remove the cat from the local array
+                savedCats = savedCats.filter(cat => cat.id !== favouriteId);
+            } else {
+                throw new Error('Failed to delete cat');
+            }
+        } catch (error) {
+            console.error('Error deleting cat:', error);
+            alert('Failed to delete cat. Please try again.');
+        }
+    }
 
     onMount(async () => {
         try {
@@ -45,13 +68,27 @@
         </div>
     {:else}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {#each savedCats as cat}
-                <div class="cat-card">
-                    <img 
-                        src={cat.image.url} 
-                        alt="Saved cat" 
-                        class="w-full h-64 object-cover rounded-lg shadow-lg"
-                    />
+            {#each savedCats as cat (cat.id)}
+                <div 
+                    class="cat-card"
+                    animate:flip={{ duration: 300 }}
+                    out:scale={{ duration: 200, start: 0.95 }}
+                    in:fade={{ duration: 200 }}
+                >
+                    <div class="relative">
+                        <img 
+                            src={cat.image.url} 
+                            alt="Saved cat" 
+                            class="w-full h-64 object-cover rounded-lg shadow-lg"
+                        />
+                        <button
+                            class="delete-button"
+                            on:click={() => deleteCat(cat.id)}
+                            title="Remove from saved"
+                        >
+                            ×
+                        </button>
+                    </div>
                 </div>
             {/each}
         </div>
@@ -75,8 +112,35 @@
         100% { transform: rotate(360deg); }
     }
 
+    .delete-button {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: rgba(255, 255, 255, 0.9);
+        color: #FF4444;
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .delete-button:hover {
+        background: #FF4444;
+        color: white;
+        transform: scale(1.1);
+    }
+
     .cat-card {
         transition: transform 0.2s;
+        position: relative;
     }
 
     .cat-card:hover {
