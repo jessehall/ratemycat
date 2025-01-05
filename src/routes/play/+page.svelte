@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import LoginPromptModal from '$lib/components/LoginPromptModal.svelte';
   import InstructionsModal from '$lib/components/InstructionsModal.svelte';
+  import SaveCatButton from '$lib/components/SaveCatButton.svelte';
 
   /** @typedef {{id: string, url: string}} CatImage */
 
@@ -151,6 +152,12 @@
         />
       </div>
       <p class="text-gray-500 md:hidden mt-4">Swipe left for NOT, right for HOT</p>
+      
+      <!-- Add Save Cat Button -->
+      <SaveCatButton 
+        catId={currentCat.id} 
+        imageUrl={currentCat.url}
+      />
     {:else}
       <div class="flex flex-col items-center space-y-4">
         <div class="loader"></div>
