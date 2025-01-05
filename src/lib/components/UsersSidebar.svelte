@@ -73,10 +73,10 @@
 <style>
     .sidebar {
         width: 20%;
-        height: 100vh;
+        height: calc(100vh - 4rem);
         position: fixed;
         right: 0;
-        top: 0;
+        top: 4rem;
         background: white;
         border-left: 1px solid #e5e7eb;
         padding: 1.5rem;

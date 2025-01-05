@@ -2,6 +2,7 @@
     import SaveSuccessModal from './SaveSuccessModal.svelte';
     export let catId = '';
     export let imageUrl = '';
+    export let visible = true;
     let showSuccessModal = false;
     
     async function saveCat() {
@@ -35,14 +36,16 @@
     onClose={() => showSuccessModal = false}
 />
 
-<button
-    on:click={saveCat}
-    class="save-button"
-    title="Save this Purrrfect cat"
->
-    <span class="heart-icon">♥</span>
-    Save this cat
-</button>
+<div class:invisible={!visible}>
+    <button
+        on:click={saveCat}
+        class="save-button"
+        title="Save this Purrrfect cat"
+    >
+        <span class="heart-icon">♥</span>
+        Save this cat
+    </button>
+</div>
 
 <style>
     .save-button {

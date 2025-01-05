@@ -36,9 +36,11 @@
   let touchEnd = 0;
   let isLoading = true;
   let showInstructions = true;
+  let showImage = true;
   
   async function fetchNewCat() {
     isLoading = true;
+    showImage = false;
     try {
       const response = await fetch('https://api.thecatapi.com/v1/images/search', {
         headers: {
@@ -52,10 +54,10 @@
       currentCat = data;
     } catch (error) {
       console.error('Error fetching cat:', error);
-      // Set a default cat image or show error state
       currentCat = null;
     } finally {
       isLoading = false;
+      showImage = true;
     }
   }
 
@@ -66,6 +68,8 @@
     if (!currentCat) return;
     
     clickCount++;
+    showImage = false;
+    
     try {
       const response = await fetch('https://api.thecatapi.com/v1/votes', {
         method: 'POST',
@@ -75,22 +79,28 @@
         },
         body: JSON.stringify({
           image_id: currentCat.id,
-          sub_id: 'user-123',
+          sub_id: 'anonymous-user',
           value: value
         })
       });
 
+      const responseData = await response.json();
+
       if (!response.ok) {
-        throw new Error(`Failed to submit vote: ${response.status}`);
+        console.error('Vote response:', responseData);
+        throw new Error(responseData.message || `Failed to submit vote: ${response.status}`);
       }
 
+      // Continue even if vote submission has issues
       score++;
       handleRating();
       fetchNewCat();
     } catch (error) {
       console.error('Error submitting vote:', error);
-      // Show error message to user
-      alert('Failed to rate cat. Please try again.');
+      // Continue with the game even if voting fails
+      score++;
+      handleRating();
+      fetchNewCat();
     }
   }
 
@@ -191,13 +201,8 @@
       class="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 
              rounded-lg shadow-lg transition-all duration-300 hover:scale-110 animate-on-click"
       on:click={(e) => {
-        const button = e.currentTarget;
-        button.classList.add('button-clicked');
-        setTimeout(() => {
-          rateCat(-1);
-          handleRating();
-          button.classList.remove('button-clicked');
-        }, 300);
+        rateCat(-1);
+        handleRating();
       }}
     >
       NOT
@@ -207,13 +212,8 @@
       class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 
              rounded-lg shadow-lg transition-all duration-300 hover:scale-110 animate-on-click"
       on:click={(e) => {
-        const button = e.currentTarget;
-        button.classList.add('button-clicked');
-        setTimeout(() => {
-          rateCat(1);
-          handleRating();
-          button.classList.remove('button-clicked');
-        }, 300);
+        rateCat(1);
+        handleRating();
       }}
     >
       HOT
@@ -230,6 +230,7 @@
     {#if currentCat && !isLoading}
       <div 
         class="w-full max-w-2xl h-[60vh] mb-4"
+        class:invisible={!showImage}
         in:smoothTransition={{ duration: 1000 }}
       >
         <img 
@@ -238,12 +239,15 @@
           class="w-full h-full object-cover rounded-lg shadow-lg"
         />
       </div>
-      <p class="text-gray-500 md:hidden mt-4">Swipe left for NOT, right for HOT</p>
+      <p class="text-gray-500 md:hidden mt-4" class:invisible={!showImage}>
+        Swipe left for NOT, right for HOT
+      </p>
       
       <!-- Add Save Cat Button -->
       <SaveCatButton 
         catId={currentCat.id} 
         imageUrl={currentCat.url}
+        visible={showImage}
       />
     {:else}
       <div class="fixed inset-0 flex flex-col items-center justify-center space-y-4">
