@@ -1,8 +1,36 @@
 <script>
+    import { onMount } from 'svelte';
     export let show = false;
+    
+    // Check if device is mobile
+    let isMobile = false;
+    
+    onMount(() => {
+        // Check if device is mobile using window width
+        isMobile = window.innerWidth <= 768;
+        
+        // Hide modal immediately if on desktop
+        if (!isMobile) {
+            show = false;
+        }
+        
+        // Update isMobile on resize
+        const handleResize = () => {
+            isMobile = window.innerWidth <= 768;
+            if (!isMobile) {
+                show = false;
+            }
+        };
+        
+        window.addEventListener('resize', handleResize);
+        
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    });
 </script>
 
-{#if show}
+{#if show && isMobile}
 <div class="modal-backdrop">
     <div class="modal">
         <h2>How to Rate Cats</h2>
