@@ -1,11 +1,14 @@
 <script>
   import { onMount } from 'svelte';
+  import LoginPromptModal from '$lib/components/LoginPromptModal.svelte';
 
   /** @typedef {{id: string, url: string}} CatImage */
 
   /** @type {CatImage | null} */
   let currentCat = null;
   let score = 0;
+  let attempts = 0;
+  let showLoginModal = false;
   let touchStart = 0;
   let touchEnd = 0;
   let isLoading = true;
@@ -73,10 +76,40 @@
     }
   }
 
+  function handleRating() {
+    attempts++;
+    
+    // Save to cookies
+    document.cookie = `score=${score};path=/;max-age=86400`; // expires in 24 hours
+    document.cookie = `attempts=${attempts};path=/;max-age=86400`;
+
+    // Show login modal after 5 attempts
+    if (attempts === 5) {
+      showLoginModal = true;
+    }
+  }
+
   onMount(() => {
     fetchNewCat();
+
+    // Load score from cookie if it exists
+    const savedScore = document.cookie.split('; ')
+      .find(row => row.startsWith('score='))
+      ?.split('=')[1];
+    if (savedScore) {
+      score = parseInt(savedScore);
+    }
+
+    const savedAttempts = document.cookie.split('; ')
+      .find(row => row.startsWith('attempts='))
+      ?.split('=')[1];
+    if (savedAttempts) {
+      attempts = parseInt(savedAttempts);
+    }
   });
 </script>
+
+<LoginPromptModal bind:show={showLoginModal} />
 
 <div class="relative min-h-screen">
   <!-- Score counter -->
@@ -113,7 +146,10 @@
     class="fixed left-4 top-1/2 transform -translate-y-1/2 bg-red-500 hover:bg-red-700 
            text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-all duration-300 
            hover:scale-110 hidden md:block"
-    on:click={() => rateCat(-1)}
+    on:click={() => {
+      rateCat(-1);
+      handleRating();
+    }}
   >
     NOT
   </button>
@@ -122,7 +158,10 @@
     class="fixed right-4 top-1/2 transform -translate-y-1/2 bg-green-500 hover:bg-green-700 
            text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-all duration-300 
            hover:scale-110 hidden md:block"
-    on:click={() => rateCat(1)}
+    on:click={() => {
+      rateCat(1);
+      handleRating();
+    }}
   >
     HOT
   </button>

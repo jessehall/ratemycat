@@ -1,9 +1,43 @@
-<div class="container mx-auto px-4 py-8">
-  <h1 class="text-4xl font-bold text-center mb-4">Is my CAT HOT OR NOT??</h1>
-  <p class="text-xl text-center mb-8">Rate cats and earn points!</p>
-  <div class="text-center">
-    <a href="/play" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-      Start Rating Cats!
-    </a>
-  </div>
-</div>
+<script>
+    import { onMount } from 'svelte';
+    import LoginPromptModal from '$lib/components/LoginPromptModal.svelte';
+    
+    let score = 0;
+    let attempts = 0;
+    let showLoginModal = false;
+
+    onMount(() => {
+        // Load score from cookie if it exists
+        const savedScore = document.cookie.split('; ')
+            .find(row => row.startsWith('score='))
+            ?.split('=')[1];
+        if (savedScore) {
+            score = parseInt(savedScore);
+        }
+
+        const savedAttempts = document.cookie.split('; ')
+            .find(row => row.startsWith('attempts='))
+            ?.split('=')[1];
+        if (savedAttempts) {
+            attempts = parseInt(savedAttempts);
+        }
+    });
+
+    function updateScore(newScore) {
+        score = newScore;
+        attempts++;
+        
+        // Save to cookies
+        document.cookie = `score=${score};path=/;max-age=86400`; // expires in 24 hours
+        document.cookie = `attempts=${attempts};path=/;max-age=86400`;
+
+        // Show login modal after 5 attempts
+        if (attempts === 5) {
+            showLoginModal = true;
+        }
+    }
+</script>
+
+<LoginPromptModal bind:show={showLoginModal} />
+
+<!-- Rest of your game component code -->
