@@ -3,6 +3,7 @@
   import LoginPromptModal from '$lib/components/LoginPromptModal.svelte';
   import InstructionsModal from '$lib/components/InstructionsModal.svelte';
   import SaveCatButton from '$lib/components/SaveCatButton.svelte';
+  import UsersSidebar from '$lib/components/UsersSidebar.svelte';
 
   /** @typedef {{id: string, url: string}} CatImage */
 
@@ -129,16 +130,48 @@
 
 <LoginPromptModal bind:show={showLoginModal} />
 <InstructionsModal bind:show={showInstructions} />
+<UsersSidebar />
 
 <div class="relative min-h-screen">
   <!-- Score counter -->
-  <div class="absolute top-4 right-4 bg-white p-2 rounded shadow">
-    <p class="text-lg font-semibold">{score} cat ratings</p>
+  <div class="absolute top-4 left-4 bg-white p-4 rounded shadow">
+    <p class="text-lg font-semibold mb-1">Your cat rating score is: {score}</p>
+    <a 
+      href="/login" 
+      class="text-sm text-blue-500 hover:text-blue-700 hover:underline"
+    >
+      Log in to save your score →
+    </a>
+  </div>
+
+  <!-- Rating buttons -->
+  <div class="flex justify-center gap-4 pt-4 pb-2">
+    <button
+      class="bg-red-500 hover:bg-red-700 text-white font-bold py-3 px-6 
+             rounded-lg shadow-lg transition-all duration-300 hover:scale-110"
+      on:click={() => {
+        rateCat(-1);
+        handleRating();
+      }}
+    >
+      NOT
+    </button>
+
+    <button
+      class="bg-green-500 hover:bg-green-700 text-white font-bold py-3 px-6 
+             rounded-lg shadow-lg transition-all duration-300 hover:scale-110"
+      on:click={() => {
+        rateCat(1);
+        handleRating();
+      }}
+    >
+      HOT
+    </button>
   </div>
 
   <!-- Main content -->
   <div 
-    class="container mx-auto px-4 py-8 flex flex-col items-center"
+    class="container mx-auto px-4 py-8 flex flex-col items-center lg:w-[80%]"
     on:touchstart={handleTouchStart}
     on:touchmove={handleTouchMove}
     on:touchend={handleTouchEnd}
@@ -165,31 +198,6 @@
       </div>
     {/if}
   </div>
-
-  <!-- Rating buttons -->
-  <button
-    class="fixed left-4 top-1/2 transform -translate-y-1/2 bg-red-500 hover:bg-red-700 
-           text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-all duration-300 
-           hover:scale-110"
-    on:click={() => {
-      rateCat(-1);
-      handleRating();
-    }}
-  >
-    NOT
-  </button>
-
-  <button
-    class="fixed right-4 top-1/2 transform -translate-y-1/2 bg-green-500 hover:bg-green-700 
-           text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-all duration-300 
-           hover:scale-110"
-    on:click={() => {
-      rateCat(1);
-      handleRating();
-    }}
-  >
-    HOT
-  </button>
 </div>
 
 <style>
